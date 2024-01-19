@@ -22,6 +22,7 @@ app.get('/', (req, res) => {
   app.use('/api/topic',require('./routes/api/topic'));
   app.use('/api/subject',require('./routes/api/subject'));
   app.use('/api/exam', require('./routes/api/exam'));
+  app.use('/api/question', require('./routes/api/question'));
   app.listen(port, () => {
     console.log(`app listening at http://localhost:${port}`);
   });

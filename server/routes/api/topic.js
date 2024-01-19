@@ -10,8 +10,8 @@ const isAdmin = require('../../middleware/isAdmin')
 
 
 // Access Protected admin only
-// Post a new Topic
-router.post('/createTopic',[auth,isAdmin,
+// Post a new Topic x
+router.post('/createTopic',[isAdmin,
     check('name','Name of Topic is reqiured').not().isEmpty()]
 ,async(req,res)=>{
     const errors = validationResult(req);
@@ -42,7 +42,7 @@ router.post('/createTopic',[auth,isAdmin,
 
 // Access Protedted Admin only
 // Get all topics
-router.get('/',[auth,isAdmin],async(req,res)=>{
+router.get('/',[isAdmin],async(req,res)=>{
     try{
         const alltopics = await Topic.find();
         res.json(alltopics);
@@ -55,7 +55,7 @@ router.get('/',[auth,isAdmin],async(req,res)=>{
 
 // Access Protected Admin only
 // Route to Rename Topic
-router.put('/:id',[auth,isAdmin,
+router.put('/:id',[isAdmin,
     check('Newname','Name of the Topic is required')],async(req,res)=>{
     const errors = validationResult(req);
     if(!errors.isEmpty()){
@@ -83,6 +83,25 @@ router.put('/:id',[auth,isAdmin,
         console.log(err.message);
         res.status(500).send('Server Error');
     }
+})
+
+//Get a Topic by ID
+//Protected route access Admin only
+router.get('/:id',isAdmin,async(req,res)=>{
+    try{
+        const {id} = req.params;
+        // console.log("id:",id);
+        const topic = await Topic.findById(id);
+        if(!topic){
+            res.status(404).json({message:"topic not found"});
+        }
+        
+        res.status(200).json(topic);
+    }catch(err){
+        console.log(err.message);
+        res.status(500).send('Server Error');
+    }
+    
 })
 
 //

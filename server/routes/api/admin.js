@@ -4,13 +4,13 @@ const router = express.Router()
 const bcrypt = require('bcrypt')
 const jwt = require('jsonwebtoken')
 const config = require('config')
-const User = require('../../models/User.js')
+const Admin = require('../../models/Admin.js')
 
 // access Public
 // Route to Create an user
 router.post(
     '/',
-    check('name', 'Name is required').notEmpty(),
+    
     check('email', 'Please include a valid email').isEmail(),
     check(
       'password',
@@ -23,21 +23,19 @@ router.post(
         return res.status(400).json({ errors: errors.array() });
       }
   
-      const { name, email, password } = req.body;
-      console.log("name:",name);
+      const { email, password } = req.body;
       console.log("email:",email);
       console.log("password:",password)
       try {
-        let user = await User.findOne({ 'email':email });
+        let admin = await Admin.findOne({ 'email':email });
   
-        if (user) {
+        if (admin) {
           return res
             .status(400)
-            .json({ errors: [{ msg: 'User already exists' }] });
+            .json({ errors: [{ msg: 'Admin already exists' }] });
         }
   
-        user = new User({
-          name,
+        admin = new Admin({
           email,
           password,
           role:'admin'
@@ -45,15 +43,15 @@ router.post(
   
         const salt = await bcrypt.genSalt(10);
   
-        user.password = await bcrypt.hash(password, salt);
+        admin.password = await bcrypt.hash(password, salt);
   
-        await user.save();
+        await admin.save();
         
         const payload = {
             user:{
-              id: user.id,
-              name: user.name,
-              email: user.email,
+              id: admin.id,
+              name: admin.name,
+              email: admin.email,
               role: 'admin'
             }
         }

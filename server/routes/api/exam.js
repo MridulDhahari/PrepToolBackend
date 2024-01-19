@@ -3,6 +3,7 @@ const { check, validationResult } = require('express-validator')
 const router = express.Router()
 const config = require('config')
 const Exam = require('../../models/Exam')
+const User = require('../../models/User')
 const auth = require('../../middleware/auth')
 const isAdmin = require('../../middleware/isAdmin')
 const { findByIdAndDelete } = require('../../models/User')
@@ -10,7 +11,7 @@ const { findByIdAndDelete } = require('../../models/User')
 //Protected Route Admin Only
 // Route /createExam Method POST
 // To create a New Exam
-router.post('/createExam',[auth,isAdmin,
+router.post('/createExam',[isAdmin,
     check('name','Name is Required (Recommended Way Exam_Subject)!').not().isEmpty(),
     ],async(req,res)=>{
         const errors = validationResult(req);
@@ -60,7 +61,7 @@ router.get('/',async(req,res)=>{
 //Protected Route
 //Route '/:id' Method PUT
 //Update the Exam
-router.put('/:id',[auth,isAdmin],async(req,res)=>{
+router.put('/:id',[isAdmin],async(req,res)=>{
     try{
         const {newName,newSubject_ids,newTest_ids,newAbout_exam} = req.body;
 
@@ -93,7 +94,7 @@ router.put('/:id',[auth,isAdmin],async(req,res)=>{
 //Protected access Admin only
 //Route :id Method delete
 //Delete the exam 
-router.delete('/:id',[auth,isAdmin],async(req,res)=>{
+router.delete('/:id',[isAdmin],async(req,res)=>{
     try{
         const {id} = req.params;
         const deletedItem = await Exam.findByIdAndRemove(id);
@@ -108,4 +109,20 @@ router.delete('/:id',[auth,isAdmin],async(req,res)=>{
     }
 
 })
+
+router.get('/:id',[auth],async(req,res)=>{
+    try{
+        const {id} = req.params;
+        const sub = await Exam.findById(id);
+        if(!sub){
+            res.status(404).json({message:"Exam not found"});
+        }
+        res.status(200).json(sub);
+
+    }catch(err){
+        console.log(err.message);
+        res.status(500).send('Server Error');
+    }
+})
+
 module.exports = router;

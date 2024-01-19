@@ -10,16 +10,16 @@ const {check , validationResult} = require('express-validator')
 // Route to Authenticate User
 router.post(
     '/',
-    check('email','Please include a valid email').isEmail(),
+    check('username','Username is required').notEmpty(),
     check('password','Please enter a 6 or more characters').exists(),
     async(req,res) => {
         const errors = validationResult(req);
         if(!errors.isEmpty()){
             return res.status(400).json({ errors: errors.array() });
         } 
-        const {email,password} = req.body;
+        const {username,password} = req.body;
         try{
-            let user = await User.findOne({email});
+            let user = await User.findOne({username});
             if(!user){
                 return res.status(400).json({errors: [{msg:'Invalid Credentials'}]});
             }
@@ -31,9 +31,11 @@ router.post(
             const payload = {
                 user:{
                     id: user.id,
-                    name: user.name,
+                    first_name: user.first_name,
+                    last_name: user.last_name,
+                    username: user.username,
                     email: user.email,
-                    role: user.role
+                    role: 'user'
                 }
             }
             console.log("user log in payload:",payload);

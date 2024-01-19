@@ -17,7 +17,13 @@ const QuestionSchema = new mongoose.Schema({
         type: String,
         required:true
     },
-    ecam_ids: [{
+    difficulty: {
+        type: String,
+        enum: ['Easy', 'Medium', 'Hard'],
+        default: 'Easy', // Set the default difficulty if not provided
+        required: true,
+    },
+    exam_ids: [{
         type: mongoose.Schema.Types.ObjectId,
         ref: 'exam',
     }],

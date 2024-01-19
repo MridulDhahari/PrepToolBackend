@@ -3,7 +3,7 @@ const router = express.Router();
 const config = require('config')
 const brcypt = require('bcrypt')
 const jwt = require('jsonwebtoken')
-const User = require('../../models/User.js')
+const Admin = require('../../models/Admin.js')
 const {check , validationResult} = require('express-validator')
 
 // @ access public
@@ -19,21 +19,20 @@ router.post(
         } 
         const {email,password} = req.body;
         try{
-            let user = await User.findOne({email});
-            if(!user){
+            let admin = await Admin.findOne({email});
+            if(!admin){
                 return res.status(400).json({errors: [{msg:'Invalid Credentials'}]});
             }
-            const isMatch  = await brcypt.compare(password,user.password);
+            const isMatch  = await brcypt.compare(password,admin.password);
             if(!isMatch){
                 return res.status(400).json({errors: [{msg:'Invalid Credentials'}]})
             }
-            console.log("user id:",user.id);
+            console.log("admin id:",admin.id);
             const payload = {
                 user:{
-                    id: user.id,
-                    name: user.name,
-                    email: user.email,
-                    role: user.role
+                    id: admin.id,
+                    email: admin.email,
+                    role: admin.role
                 }
             }
             console.log("admin log in payload:",payload);

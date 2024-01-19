@@ -10,7 +10,7 @@ const isAdmin = require('../../middleware/isAdmin')
 
 // Access Protected and Admin only
 // route to Add Subject
-router.post('/createSubject',[auth,isAdmin,
+router.post('/createSubject',[isAdmin,
     check('name','Name is Required (Recommended Way Exam_Subject)!').not().isEmpty(),
     check('topic_ids','The Sub-topic Field is Required !').not().isEmpty()
     ],async(req,res)=>{
@@ -65,8 +65,8 @@ router.put('/:id',[auth,isAdmin],async(req,res)=>{
         if(!getSubject){
             return res.status(404).json({ message: 'Subject not found' });
         }
-        console.log("getsubject: ",getSubject);
-        console.log("subject was found");
+        // console.log("getsubject: ",getSubject);
+        // console.log("subject was found");
         if(newName!==getSubject.name){
             const sameName = await Subject.findOne({ name: newName });
             if(sameName){
@@ -81,5 +81,23 @@ router.put('/:id',[auth,isAdmin],async(req,res)=>{
         console.error(err);
         res.status(500).json({ error: 'Internal Server Error' });
     }
+})
+
+//Get a Subject by ID
+//Protected route access Admin only
+router.get('/:id',isAdmin,async(req,res)=>{
+    try{
+        const {id} = req.params;
+        // console.log("id:",id);
+        const subject = await Subject.findById(id);
+        if(!subject){
+            res.status(404).json({message:"subject not found"});
+        }
+        res.status(200).json(subject);
+    }catch(err){
+        console.log(err.message);
+        res.status(500).send('Server Error');
+    }
+    
 })
 module.exports = router;
